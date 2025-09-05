@@ -71,18 +71,22 @@ ax.legend()
 st.pyplot(fig)
 
 # --- Tabla final ---
-st.subheader("📊 Resumen de precios al último día")
+# --- Tabla final con comparación en día intermedio y final ---
+st.subheader("📊 Resumen de precios en días clave")
+
+mid_index = T_days // 2  # Día intermedio (por ejemplo, día 90 si T=180)
 
 summary = pd.DataFrame({
-    "Spot P10": [spot_percentiles["P10"].iloc[-1]],
-    "Spot P50": [spot_percentiles["P50"].iloc[-1]],
-    "Spot P90": [spot_percentiles["P90"].iloc[-1]],
-    "Futuro P10": [futures_percentiles["P10"].iloc[-1]],
-    "Futuro P50": [futures_percentiles["P50"].iloc[-1]],
-    "Futuro P90": [futures_percentiles["P90"].iloc[-1]],
-})
+    "Spot P10": [spot_percentiles["P10"].iloc[mid_index], spot_percentiles["P10"].iloc[-1]],
+    "Spot P50": [spot_percentiles["P50"].iloc[mid_index], spot_percentiles["P50"].iloc[-1]],
+    "Spot P90": [spot_percentiles["P90"].iloc[mid_index], spot_percentiles["P90"].iloc[-1]],
+    "Futuro P10": [futures_percentiles["P10"].iloc[mid_index], futures_percentiles["P10"].iloc[-1]],
+    "Futuro P50": [futures_percentiles["P50"].iloc[mid_index], futures_percentiles["P50"].iloc[-1]],
+    "Futuro P90": [futures_percentiles["P90"].iloc[mid_index], futures_percentiles["P90"].iloc[-1]],
+}, index=[f"Día {mid_index}", f"Día {T_days}"])
 
 st.dataframe(summary.style.format("${:,.0f}"))
+
 
 # --- Descargar CSV ---
 st.download_button(
@@ -98,3 +102,4 @@ st.download_button(
     file_name="btc_futuros_simulaciones.csv",
     mime="text/csv"
 )
+

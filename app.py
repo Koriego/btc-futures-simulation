@@ -40,10 +40,13 @@ days = np.arange(prices.shape[0])
 prices_df = pd.DataFrame(prices, index=days)
 
 # --- Calcular precios de futuros ---
-futures_df = prices_df.copy()
-for t in days:
-    T_minus_t = (T_days - t) / 365
-    futures_df.loc[t] = prices_df.loc[t] * np.exp(r * T_minus_t)
+# --- Calcular precios de futuros (vectorizado) ---
+T_array = (T_days - days) / 365  # shape (n_days,)
+adjustment_factors = np.exp(r * T_array)  # shape (n_days,)
+
+# Expand to shape (n_days, n_sim)
+futures_df = prices_df.mul(adjustment_factors[:, np.newaxis], axis=0)
+
 
 # --- Calcular percentiles ---
 def get_percentiles(df):
@@ -114,3 +117,4 @@ st.download_button(
     file_name="simulaciones_futuros.csv",
     mime="text/csv"
 )
+
